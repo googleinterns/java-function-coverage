@@ -16,7 +16,7 @@ package com.funccover;
 
 import java.util.ArrayList;
 
-// Metrics class saves the coverage data
+// CoverageMetrics class saves the coverage data
 // Every index corresponds to one method, transformer calls addMethod with method descriptions
 // Then it inserts a call to setExecuted method with corresponding index to each method
 public class CoverageMetrics {
