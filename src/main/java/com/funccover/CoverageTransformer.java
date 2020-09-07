@@ -52,7 +52,6 @@ public class CoverageTransformer implements ClassFileTransformer {
                             byte[] classfileBuffer) throws IllegalClassFormatException {
         
         // if we do not want to instrument given class, return null
-
         if(classBeingRedefined != null || Filter.check(loader, className) == false) {
             return null;
         }
@@ -83,7 +82,6 @@ public class CoverageTransformer implements ClassFileTransformer {
                 if (method.isEmpty()) {
                     continue;
                 }
-               // System.out.println(loader);
                 instrumentMethod(method, loader);
                 flag = true;
             }
@@ -100,14 +98,19 @@ public class CoverageTransformer implements ClassFileTransformer {
         return result;
     }
 
-    // Inserts a new method to CoverageMetrics and inserts setCounter call to the given method
+    // Inserts a new method to CoverageMetrics and inserts setExecuted call to the given method
     private static void instrumentMethod(CtMethod target, ClassLoader loader) throws CannotCompileException {
         if(isNative(target)) {
             return ;
         }
-        CoverageMetrics.addCounter(target.getLongName());
+
+        String className = target.getLongName();
+        String methodName = className.substring(className.lastIndexOf('.') + 1);
+        className = className.substring(0, className.lastIndexOf('.'));
+        
+        CoverageMetrics.addMethod(className, methodName);
         // fix the cannot compile error (no method body)
-        target.insertBefore("CoverageMetrics.setCounter(" + counter + ");");
+        target.insertBefore("CoverageMetrics.setExecuted(" + counter + ");");
         counter++;
     }
 

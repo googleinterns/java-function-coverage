@@ -20,17 +20,18 @@ import java.lang.Thread;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Executors;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.io.File; 
 import java.io.FileWriter;
 
 public class Handler {
 
+    
+    private ArrayList<String> classNames;
     private ArrayList<String> methodNames;
-    private ArrayList<Boolean> methodCounters;    
+    private ArrayList<Boolean> methodFlags;    
 
-    // To avoid Runner and LastCall tryin to write to file at the same time
+    // To avoid Runner and LastCall trying to write to file at the same time
     // one can use shutdown and awaitTermination functions in the scheduler
     // so that scheduler will not schedule any other tasks and 
     // LastCall will be blocked until scheduler finishes its already scheduled task
@@ -38,10 +39,11 @@ public class Handler {
     // shutdownNow is used here
     ScheduledExecutorService scheduler;
     
-    // Constructor that gets the Metrics fields
-    public Handler(ArrayList<String> methodNames, ArrayList<Boolean> methodCounters) {
+    // Constructor that uses the CoverageMetrics variables
+    public Handler(ArrayList<String> classNames, ArrayList<String> methodNames, ArrayList<Boolean> methodFlags) {
+        this.classNames = classNames;
         this.methodNames = methodNames;
-        this.methodCounters = methodCounters;
+        this.methodFlags = methodFlags;
     }
 
     // start function will be invoked at the beginning
@@ -56,7 +58,7 @@ public class Handler {
                return thread;
             }
         });
-        //scheduler.scheduleWithFixedDelay(new Runner(), 500, 500, TimeUnit.MILLISECONDS);
+        scheduler.scheduleWithFixedDelay(new Runner(), 500, 500, TimeUnit.MILLISECONDS);
         Runtime.getRuntime().addShutdownHook(new LastCall());
     }
 
@@ -72,8 +74,9 @@ public class Handler {
                 FileWriter myWriter = new FileWriter("coverage.out");
                 final int len = methodNames.size();
                 for(int i = 0; i < len; i++) {
+                    myWriter.write(classNames.get(i) + ":");
                     myWriter.write(methodNames.get(i) + ":");
-                    if(methodCounters.get(i)) myWriter.write("1\n");
+                    if(methodFlags.get(i)) myWriter.write("1\n");
                     else myWriter.write("0\n");    
                 }
                 myWriter.close();
@@ -96,8 +99,9 @@ public class Handler {
                 FileWriter myWriter = new FileWriter("coverage.out");
                 final int len = methodNames.size();
                 for(int i = 0; i < len; i++) {
+                    myWriter.write(classNames.get(i) + ":");
                     myWriter.write(methodNames.get(i) + ":");
-                    if(methodCounters.get(i)) myWriter.write("1\n");
+                    if(methodFlags.get(i)) myWriter.write("1\n");
                     else myWriter.write("0\n");    
                 }
                 myWriter.close();

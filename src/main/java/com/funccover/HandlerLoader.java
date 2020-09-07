@@ -45,11 +45,14 @@ class HandlerLoader {
             
             // Gets the constructor of given class an create an instance
             Constructor handlerConstructor = cls.getConstructor(new Class[] {
+                CoverageMetrics.classNames.getClass(),
                 CoverageMetrics.methodNames.getClass(),
-                CoverageMetrics.methodCounters.getClass()});
+                CoverageMetrics.methodFlags.getClass()});
 
             // Creates an instance of the handler with CoverageMetrics variables
-            handler = handlerConstructor.newInstance(CoverageMetrics.methodNames, CoverageMetrics.methodCounters);
+            handler = handlerConstructor.newInstance(CoverageMetrics.classNames,
+                CoverageMetrics.methodNames,
+                CoverageMetrics.methodFlags);
             
             // Gets the start method in newly created instance
             start = cls.getMethod("start");

@@ -18,13 +18,15 @@ import java.util.ArrayList;
 
 public class SimpleHandler {
 
+    private ArrayList<String> classNames;
     private ArrayList<String> methodNames;
-    private ArrayList<Boolean> methodCounters;    
+    private ArrayList<Boolean> methodFlags;    
 
     // This constuctor must be implemented
-    public ExampleHandler(ArrayList<String> methodNames, ArrayList<Boolean> methodCounters) {
+    public SimpleHandler(ArrayList<String> classNames, ArrayList<String> methodNames, ArrayList<Boolean> methodFlags) {
+        this.classNames = classNames;
         this.methodNames = methodNames;
-        this.methodCounters = methodCounters;
+        this.methodFlags = methodFlags;
     }
 
     // Start method must be implemented, it will be called by the agent
