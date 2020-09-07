@@ -33,13 +33,6 @@ limitations under the License.
 
 Java Function Coverage is a java agent that instruments the specified classes before load time. It collects the function coverage data for all the methods in those classes. The agent must be passed to the jvm with -javaagent option. The agent will instrument the bytecodes of the classes before they load into memory. 
 
-## Quickstart
-
-```bash
-# Get the package from Github and install it from main directory of the package
-$ mvn package
-```
-
 ## How To Use It
 
 To attach the agent you should give the agent as an argument to jvm. Agent itself also has arguments. 
