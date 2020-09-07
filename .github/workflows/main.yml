@@ -11,4 +11,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Google Java Format
-        uses: axel-op/googlejavaformat-action
+        uses: axel-op/googlejavaformat-action@v3.3.2
