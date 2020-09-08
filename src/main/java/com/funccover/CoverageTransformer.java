@@ -24,25 +24,25 @@ import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.Modifier;
 
-// CoverageTransformer implements a class that will be used in instrumentation
+// CoverageTransformer implements a class that will be used in instrumentation.
 public class CoverageTransformer implements ClassFileTransformer {
 
-  // Keeps the number methods instrumented so far
+  // Keeps the number methods instrumented so far.
   private static int counter = 0;
 
-  // the ClassPool object returned by getDefault() searches the default system search path
+  // ClassPool object returned by getDefault() searches the default system search path.
   // If a program is running on a web application server such as JBoss and Tomcat,
-  // the ClassPool object may not be able to find user classes
+  // the ClassPool object may not be able to find user classes.
   // In that case, an additional class path must be registered to the ClassPool.
-  // ClassPool used to compile inserted source code to bytecode
+  // ClassPool used to compile inserted source code to bytecode.
   private final ClassPool classPool = ClassPool.getDefault();
 
   CoverageTransformer() {
     classPool.importPackage("com.funccover.CoverageMetrics");
   }
 
-  // transform instruments given bytecode and returns instrumented bytecode
-  // if it returns null, then given class will be loaded without instrumentation
+  // transform instruments given bytecode and returns instrumented bytecode.
+  // If it returns null, then given class will be loaded without instrumentation.
   @Override
   public byte[] transform(
       ClassLoader loader,
@@ -52,23 +52,23 @@ public class CoverageTransformer implements ClassFileTransformer {
       byte[] classfileBuffer)
       throws IllegalClassFormatException {
 
-    // if we do not want to instrument given class, return null
+    // If we do not want to instrument given class, return null.
     if (classBeingRedefined != null || Filter.check(loader, className) == false) {
       return null;
     }
 
     byte[] result = null;
     try {
-      // Creates a new class with the given bytecode
+      // Creates a new class with the given bytecode.
       CtClass ct = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
 
-      // checks if the class is already loaded
+      // Checks if the class is already loaded.
       if (ct.isFrozen()) {
         ct.detach();
         return null;
       }
 
-      // filter for instrumentation
+      // Filter for instrumentation.
       if (ct.isPrimitive()
           || ct.isArray()
           || ct.isAnnotation()
@@ -78,10 +78,10 @@ public class CoverageTransformer implements ClassFileTransformer {
         return null;
       }
 
-      // flag is true if instrumented
+      // flag is true if some methods inside ct are instrumented.
       boolean flag = false;
 
-      // Iterates over all methods and instruments them
+      // Iterates over all methods and instruments them.
       for (CtMethod method : ct.getDeclaredMethods()) {
         if (method.isEmpty()) {
           continue;
@@ -94,7 +94,7 @@ public class CoverageTransformer implements ClassFileTransformer {
         result = ct.toBytecode();
       }
 
-      // detach removes newly created class from cp to avoid unnecesarry memory consumption
+      // detach removes newly created class from cp to avoid unnecesarry memory consumption.
       ct.detach();
     } catch (Throwable e) {
       e.printStackTrace();
@@ -102,7 +102,7 @@ public class CoverageTransformer implements ClassFileTransformer {
     return result;
   }
 
-  // Inserts a new method to CoverageMetrics and inserts setExecuted call to the given method
+  // Inserts a new method to CoverageMetrics and inserts setExecuted call to the given method.
   private static void instrumentMethod(CtMethod target, ClassLoader loader)
       throws CannotCompileException {
     if (isNative(target)) {
@@ -114,7 +114,6 @@ public class CoverageTransformer implements ClassFileTransformer {
     className = className.substring(0, className.lastIndexOf('.'));
 
     CoverageMetrics.addMethod(className, methodName);
-    // fix the cannot compile error (no method body)
     target.insertBefore("CoverageMetrics.setExecuted(" + counter + ");");
     counter++;
   }

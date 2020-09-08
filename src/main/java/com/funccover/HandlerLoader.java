@@ -20,21 +20,21 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-// HandlerLoader implements the functionality of loading and starting the Handler
+// HandlerLoader implements the functionality of loading and starting the Handler.
 class HandlerLoader {
 
   // Loads the given class to the memory and invokes its start() method with CoverageMetrics
-  // variables
+  // variables.
   protected static void initializeCustomHandler(String path, String className) {
 
     URL url = getURL(path);
     File file = new File(path);
 
-    // cl is the class loader to load handler
+    // cl is the classloader to load the handler.
     URLClassLoader cl = null;
 
-    // handler keeps an instance of given class
-    // starts keeps the start() method
+    // handler keeps an instance of given class.
+    // starts keeps the start() method.
     Object handler = null;
     Method start = null;
 
@@ -43,7 +43,7 @@ class HandlerLoader {
       cl = new URLClassLoader(new URL[] {url});
       Class cls = cl.loadClass(className);
 
-      // Gets the constructor of given class an create an instance
+      // Gets the constructor of given class an create an instance.
       Constructor handlerConstructor =
           cls.getConstructor(
               new Class[] {
@@ -52,12 +52,12 @@ class HandlerLoader {
                 CoverageMetrics.methodFlags.getClass()
               });
 
-      // Creates an instance of the handler with CoverageMetrics variables
+      // Creates an instance of the handler with CoverageMetrics variables.
       handler =
           handlerConstructor.newInstance(
               CoverageMetrics.classNames, CoverageMetrics.methodNames, CoverageMetrics.methodFlags);
 
-      // Gets the start method in newly created instance
+      // Gets the start method in newly created instance.
       start = cls.getMethod("start");
     } catch (Exception e) {
       e.printStackTrace();
@@ -86,7 +86,7 @@ class HandlerLoader {
       return null;
     }
 
-    // convert dir in filepath to url
+    // Converts dir in filepath to URL.
     if (pathArgs[0].equals("dir")) {
       File file = new File(pathArgs[1]);
       try {
@@ -96,7 +96,7 @@ class HandlerLoader {
         return null;
       }
     }
-    // convert jar in filepath to url
+    // Converts jar in filepath to URL.
     else if (pathArgs[0].equals("jar")) {
       File file = new File(pathArgs[1]);
       try {

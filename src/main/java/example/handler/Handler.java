@@ -30,14 +30,14 @@ public class Handler {
   private ArrayList<Boolean> methodFlags;
 
   // To avoid Runner and LastCall trying to write to file at the same time
-  // one can use shutdown and awaitTermination functions in the scheduler
-  // so that scheduler will not schedule any other tasks and
-  // LastCall will be blocked until scheduler finishes its already scheduled task
-  // One can also use shutdownNow method to cancel all the tasks
-  // shutdownNow is used here
+  // one can use shutdown and awaitTermination functions in the scheduler.
+  // So that scheduler will not schedule any other tasks and
+  // LastCall will be blocked until scheduler finishes its already scheduled task.
+  // One can also use shutdownNow method to cancel all the tasks.
+  // Here, shutdownNow is used.
   ScheduledExecutorService scheduler;
 
-  // Constructor that uses the CoverageMetrics variables
+  // Constructor that uses the CoverageMetrics variables.
   public Handler(
       ArrayList<String> classNames, ArrayList<String> methodNames, ArrayList<Boolean> methodFlags) {
     this.classNames = classNames;
@@ -45,8 +45,8 @@ public class Handler {
     this.methodFlags = methodFlags;
   }
 
-  // start function will be invoked at the beginning
-  // it creates a scheduler that will call a runnable every 500ms
+  // start() function will be invoked at the beginning.
+  // It creates a scheduler that will call a runnable every 500ms.
   public void start() {
 
     scheduler =
@@ -64,8 +64,8 @@ public class Handler {
     Runtime.getRuntime().addShutdownHook(new LastCall());
   }
 
-  // Runner implements a Runnable that will write the coverage data
-  // run() will be called by scheduler every 500ms
+  // Runner implements a Runnable that will write the coverage data.
+  // run() will be called by scheduler every 500ms.
   public class Runner implements Runnable {
 
     public void run() {
