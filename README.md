@@ -73,7 +73,7 @@ $ bazel build //src/main/java/com/funccover:funccover_deploy.jar
    * Entry class must implement a consturctor that uses CoverageMetrics parameters.
    * Entry class must implement a function start(), this function is the entry point.
    * Agent loads entry class into the memory, creates an instance of it with CoverageMetrics variables and invokes the start() method. 
-   * Please take a look at the examples, [Handler](../blob/master/src/main/java/example/handler/Handler.java), [Simple Handler](..blob/master/src/main/java/example/handler/SimpleHandler.java)
+   * Please take a look at the examples, [Handler](../master/src/main/java/example/handler/Handler.java), [Simple Handler](../master/src/main/java/example/handler/SimpleHandler.java)
    
 * Build and run your program
 
