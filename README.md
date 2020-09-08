@@ -40,19 +40,20 @@ limitations under the License.
 $ bazel build //src/main/java/com/funccover:funccover_deploy.jar
 ```
 
+This should generate the file ```bazel-bin/src/main/java/com/funccover/funccover_deploy.jar``` under the project root.
+
 * Build the example [handler](#handler) in the repository
 
 ```bash
 $ bazel build //src/main/java/example/handler:Handler
 ```
 
+This should generate the file ```bazel-bin/src/main/java/example/handler/libHandler.jar``` under the project root.
+
 * Build the example program binary with coverage
 
 ```bash
-$ bazel build --jvmopt="-javaagent:agent_path='jar:handler_path example.handler.Handler' "  //src/main/java/example/program:HelloWorld 
-
-Here agent_path is bazel-bin/src/main/java/com/funccover/funccover_deploy.jar, 
-handler_path is bazel-bin/src/main/java/example/handler/libHandler.jar
+$ bazel build --jvmopt="-javaagent:bazel-bin/src/main/java/com/funccover/funccover_deploy.jar='jar:bazel-bin/src/main/java/example/handler/libHandler.jar example.handler.Handler' "  //src/main/java/example/program:HelloWorld 
 ```
 
 This will generate an executable inside ```bazel-bin/src/main/java/example/program/HelloWorld```.
