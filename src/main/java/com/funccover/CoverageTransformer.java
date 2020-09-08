@@ -94,7 +94,8 @@ public class CoverageTransformer implements ClassFileTransformer {
         result = ct.toBytecode();
       }
 
-      // Function detach removes newly created class from cp to avoid unnecesarry memory consumption.
+      // Function detach removes newly created class from cp to avoid unnecesarry memory
+      // consumption.
       ct.detach();
     } catch (Throwable e) {
       e.printStackTrace();
