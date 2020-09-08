@@ -22,7 +22,7 @@ public class SimpleHandler {
   private ArrayList<String> methodNames;
   private ArrayList<Boolean> methodFlags;
 
-  // This constuctor must be implemented
+  // This constuctor must be implemented.
   public SimpleHandler(
       ArrayList<String> classNames, ArrayList<String> methodNames, ArrayList<Boolean> methodFlags) {
     this.classNames = classNames;
@@ -30,7 +30,7 @@ public class SimpleHandler {
     this.methodFlags = methodFlags;
   }
 
-  // Start method must be implemented, it will be called by the agent
+  // Start method must be implemented, it will be called by the agent.
   public void start() {
     // You can do anything here with methodNames and methodCounters.
     // They point to static variables in CoverageMetrics so you can assume they are up to date.

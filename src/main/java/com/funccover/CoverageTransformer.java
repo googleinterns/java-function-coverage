@@ -41,7 +41,7 @@ public class CoverageTransformer implements ClassFileTransformer {
     classPool.importPackage("com.funccover.CoverageMetrics");
   }
 
-  // transform instruments given bytecode and returns instrumented bytecode.
+  // Method transform instruments given bytecode and returns instrumented bytecode.
   // If it returns null, then given class will be loaded without instrumentation.
   @Override
   public byte[] transform(
@@ -78,7 +78,7 @@ public class CoverageTransformer implements ClassFileTransformer {
         return null;
       }
 
-      // flag is true if some methods inside ct are instrumented.
+      // Variable flag is true if some methods inside ct are instrumented.
       boolean flag = false;
 
       // Iterates over all methods and instruments them.
@@ -94,7 +94,7 @@ public class CoverageTransformer implements ClassFileTransformer {
         result = ct.toBytecode();
       }
 
-      // detach removes newly created class from cp to avoid unnecesarry memory consumption.
+      // Function detach removes newly created class from cp to avoid unnecesarry memory consumption.
       ct.detach();
     } catch (Throwable e) {
       e.printStackTrace();
