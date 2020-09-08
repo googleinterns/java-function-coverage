@@ -14,8 +14,9 @@
 
 package com.funccover;
 
-
 class Filter {
+  // FIlters the classes that we do not want to instrument.
+  // This function can be changed to allow whitelists/blacklists.
   protected static boolean check(ClassLoader loader, String className) {
     if (className.startsWith("com/funccover") || loader == null) {
       return false;

@@ -32,14 +32,14 @@ public class SimpleHandler {
 
   // Start method must be implemented, it will be called by the agent
   public void start() {
-    // you can do anything here with methodNames and methodCounters
-    // they point to static variables in Metrics so you can assume they are up to date
+    // You can do anything here with methodNames and methodCounters.
+    // They point to static variables in CoverageMetrics so you can assume they are up to date.
     System.out.println("Handler started executing");
     Runner runner = new Runner("google");
     runner.hello();
   }
 
-  // Some random class definition
+  // Some random class definition.
   public class Runner {
 
     private String str;
