@@ -30,16 +30,16 @@ class HandlerLoader {
     URL url = getURL(path);
     File file = new File(path);
 
-    // cl is the classloader to load the handler.
+    // Variable cl is the classloader to load the handler.
     URLClassLoader cl = null;
 
-    // handler keeps an instance of given class.
-    // starts keeps the start() method.
+    // Variable handler keeps an instance of given class.
+    // Variable starts keeps the start() method.
     Object handler = null;
     Method start = null;
 
     try {
-      // load the class from given url
+      // Loads the class from given URL.
       cl = new URLClassLoader(new URL[] {url});
       Class cls = cl.loadClass(className);
 

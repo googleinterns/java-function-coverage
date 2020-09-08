@@ -18,7 +18,7 @@ import java.lang.instrument.Instrumentation;
 
 public class CoverageAgent {
 
-  // premain method starts executing by the jvm before main method.
+  // Methid premain starts executing by the jvm before main method.
   // It initializes the Handler and Transformer.
   public static void premain(String args, Instrumentation inst) {
 

@@ -37,7 +37,7 @@ public class Handler {
   // Here, shutdownNow is used.
   ScheduledExecutorService scheduler;
 
-  // Constructor that uses the CoverageMetrics variables.
+  // Constructor that uses the CoverageMetrics variables. Custom Handler must implement this.
   public Handler(
       ArrayList<String> classNames, ArrayList<String> methodNames, ArrayList<Boolean> methodFlags) {
     this.classNames = classNames;
@@ -45,8 +45,9 @@ public class Handler {
     this.methodFlags = methodFlags;
   }
 
-  // start() function will be invoked at the beginning.
+  // Function start() will be invoked at the beginning.
   // It creates a scheduler that will call a runnable every 500ms.
+  // Custom Handler must implement a start() function.
   public void start() {
 
     scheduler =
@@ -65,7 +66,7 @@ public class Handler {
   }
 
   // Runner implements a Runnable that will write the coverage data.
-  // run() will be called by scheduler every 500ms.
+  // Function run() will be called by scheduler every 500ms.
   public class Runner implements Runnable {
 
     public void run() {
@@ -89,6 +90,8 @@ public class Handler {
     }
   }
 
+  // LastCall implements a Thread that will write the coverage data.
+  // Function run() will be called just before jvm exits.
   public class LastCall extends Thread {
 
     public void run() {
