@@ -29,41 +29,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ```
 
-## Overview
+## Quickstart
 
-Java Function Coverage is a java agent that instruments the specified classes before load time. It collects the function coverage data for all the methods in those classes. The agent must be passed to the jvm with -javaagent option. The agent will instrument the bytecodes of the classes before they load into memory. 
 
-## How To Use It
+### With The Included Examples
 
-To attach the agent you should give the agent as an argument to jvm. Agent itself also has arguments. 
-
-* type can be "url", "jar" or "dir". 
-    * If its url, path/to/handler must be an url
-    * If its jar path/to/handler must be a path to a jar file  
-    * If its dir path/to/handler must be a path to a directory that contains .class files (folders must be structured same as jar files)
-    
-* packageName.ClassName argument must be the fully qualified name of the Handler class (example.handler.Handler in the sample Handler.java) that contains a start() method and necessary constructor. An instance of this class will be created during runtime and start() method will be called at the very beginning. See the Handler directory for example implementations.  
-
-```bash
-$  java -javaagent:path/to/agent.jar="type:path/to/handler packageName.ClassName" [other args..]
-```
-
-### Example Usage with Bazel
-This repository implements a simple program to test the coverage tool.
-
-First build funccover agent
+* Build [funccover agent](#funccover-agent)
 
 ```bash
 $ bazel build //src/main/java/com/funccover:funccover_deploy.jar
 ```
 
-Then build the example handler in the repository
+* Build the example [handler](#handler) in the repository
 
 ```bash
 $ bazel build //src/main/java/example/handler:Handler
 ```
 
-Then finally build the example program binary with the agent and handler
+* Build the example program binary with coverage
 
 ```bash
 $ bazel build --jvmopt="-javaagent:agent_path='jar:handler_path example.handler.Handler' "  //src/main/java/example/program:HelloWorld 
@@ -73,5 +56,58 @@ handler_path is bazel-bin/src/main/java/example/handler/libHandler.jar
 ```
 
 This will generate an executable inside ```bazel-bin/src/main/java/example/program/HelloWorld```.
-When you run it, it will ask you to enter numbers in range [1-9] in a line then it will call ```f$number``` function for each number you entered.
-coverage data will be saved to ```coverage.out```
+When you run it, it will ask you to enter numbers in range [1-9] in a line, then it will call ```f$number``` function for each number you entered.
+Coverage data will be saved to ```coverage.out```.
+
+### With Customization
+
+* Build [funccover agent](#funccover-agent)
+
+```bash
+$ bazel build //src/main/java/com/funccover:funccover_deploy.jar
+```
+
+
+* Implement and build your [handler](#handler)
+   * Handler program implements an entry class.
+   * Entry class must implement a consturctor that uses CoverageMetrics parameters.
+   * Entry class must implement a function start(), this function is the entry point.
+   * Agent loads entry class into the memory, creates an instance of it with CoverageMetrics variables and invokes the start() method. 
+   * Please take a look at the examples, [Handler](../blob/master/src/main/java/example/handler/Handler.java), [Simple Handler](..blob/master/src/main/java/example/handler/SimpleHandler.java)
+   
+* Build and run your program
+
+```bash
+$ bazel build --jvmopt="-javaagent:path/to/agent.jar='type:path/to/handler packageName.ClassName' "  //YourProgram
+```
+
+You can also attach funccover agent to programs that are already built. To attach the agent you should give the agent as an argument to jvm.
+
+```bash
+$ java -javaagent:path/to/agent.jar='type:path/to/handler packageName.ClassName' -jar YourProgram.jar
+```
+
+### Concepts
+
+Java Function Coverage tool consists of 2 parts, funccover agent and a handler. To collect production coverage data you need to have both.
+
+#### funccover Agent
+
+In general a java agent is just a specially crafted .jar file that utilizes the [Instrumentation API](https://docs.oracle.com/javase/7/docs/api/java/lang/instrument/Instrumentation.html "Instrumentation API"). Using Instrumentation API, funccover agent instruments bytecodes before JVM loads them into memory. Using instrumentation, we record execution of methods inside a data structure called CoverageMetrics. Agent itself does not upload/write the coverage data. Handler program does.
+
+funccover agent gets 2 arguments. 
+
+```bash
+"type:path/to/handler packageName.ClassName"
+```
+
+* type can be "url", "jar" or "dir". 
+    * If its url, path/to/handler must be an url
+    * If its jar path/to/handler must be a path to a jar file  
+    * If its dir path/to/handler must be a path to a directory that contains .class files (folders must be structured same as jar files)
+    
+* packageName.ClassName argument must be the fully qualified name of the Handler class
+
+#### Handler
+
+Handler is a program that implements certain functionality. Our agent gets the handler program and its entry class. It loads the program and creates an instance of given class with CoverageMetrics variables. Handler must implment an entry function. funccover agent calls that entry function. 
