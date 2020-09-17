@@ -42,22 +42,22 @@ $ bazel build //src/main/java/com/funccover:funccover_deploy.jar
 
 This should generate the file ```bazel-bin/src/main/java/com/funccover/funccover_deploy.jar``` under the project root.
 
-* Build the example [handler](#handler) in the repository
+* Build the example [handler](#handler) in the repository.
 
 ```bash
-$ bazel build //src/main/java/example/handler:Handler
+$ bazel build //src/main/java/example/handler:handler_deploy.jar
 ```
 
-This should generate the file ```bazel-bin/src/main/java/example/handler/libHandler.jar``` under the project root.
+This should generate the file ```bazel-bin/src/main/java/example/handler/handler_deploy.jar``` under the project root.
 
 * Build the example program binary with coverage
 
 ```bash
-$ bazel build --jvmopt="-javaagent:bazel-bin/src/main/java/com/funccover/funccover_deploy.jar='jar:bazel-bin/src/main/java/example/handler/libHandler.jar example.handler.Handler' "  //src/main/java/example/program:HelloWorld 
+$ bazel build --jvmopt="-javaagent:bazel-bin/src/main/java/com/funccover/funccover_deploy.jar='jar:bazel-bin/src/main/java/example/handler/handler_deploy.jar example.handler.Handler' "  //src/main/java/example/program:ExampleProgram 
 ```
 
-This will generate an executable inside ```bazel-bin/src/main/java/example/program/HelloWorld```.
-When you run it, it will ask you to enter numbers in range [1-9] in a line, then it will call ```f$number``` function for each number you entered.
+This will generate an executable inside ```bazel-bin/src/main/java/example/program/ExampleProgram```.
+When you run it, it will ask you to enter numbers in range [0-9], then it will call ```f$number``` function for each number you entered.
 Coverage data will be saved to ```coverage.out```.
 
 ### With Customization
@@ -70,10 +70,10 @@ $ bazel build //src/main/java/com/funccover:funccover_deploy.jar
 
 
 * Implement and build your [handler](#handler)
-   * Handler program implements an entry class.
-   * Entry class must implement a consturctor that uses CoverageMetrics parameters.
-   * Entry class must implement a function start(), this function is the entry point.
-   * Agent loads entry class into the memory, creates an instance of it with CoverageMetrics variables and invokes the start() method. 
+   * Handler program must implement a Runnable class as it's entry pont.
+   * Agent will create a new class loader with given path.
+   * It will load given entry point, Runnable class into the memory, create an instance of it and invoke the run() method. 
+   * Path must contain all the dependencies of handler program since they will be needed in runtime.
    * Please take a look at the examples, [Handler](../master/src/main/java/example/handler/Handler.java), [Simple Handler](../master/src/main/java/example/handler/SimpleHandler.java)
    
 * Build and run your program
@@ -107,8 +107,8 @@ funccover agent gets 2 arguments.
     * If its jar path/to/handler must be a path to a jar file  
     * If its dir path/to/handler must be a path to a directory that contains .class files (folders must be structured same as jar files)
     
-* packageName.ClassName argument must be the fully qualified name of the Handler class
+* packageName.ClassName argument must be the fully qualified name of the entry class that implements a Runnable
 
 #### Handler
 
-Handler is a program that implements certain functionality. Our agent gets the handler program and its entry class. It loads the program and creates an instance of given class with CoverageMetrics variables. Handler must implment an entry function. funccover agent calls that entry function. 
+Handler is a program that implements Runnable class as entry point. Our agent gets the handler program and its entry class. It loads the program and creates an instance of given entry class.

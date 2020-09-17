@@ -14,37 +14,23 @@
 
 package example.handler;
 
-import java.util.ArrayList;
+public class SimpleHandler implements Runnable {
 
-public class SimpleHandler {
-
-  private ArrayList<String> classNames;
-  private ArrayList<String> methodNames;
-  private ArrayList<Boolean> methodFlags;
-
-  // This constuctor must be implemented.
-  public SimpleHandler(
-      ArrayList<String> classNames, ArrayList<String> methodNames, ArrayList<Boolean> methodFlags) {
-    this.classNames = classNames;
-    this.methodNames = methodNames;
-    this.methodFlags = methodFlags;
-  }
-
-  // Start method must be implemented, it will be called by the agent.
-  public void start() {
-    // You can do anything here with methodNames and methodCounters.
-    // They point to static variables in CoverageMetrics so you can assume they are up to date.
-    System.out.println("Handler started executing");
+  // Entry point run() method must be implemented for Runnable.
+  // It will be invoked by HandlerLoader.
+  public void run() {
+    // You can import CoverageMetrics and use it to upload coverage data.
+    System.out.println("Simple Handler started executing");
     Runner runner = new Runner("google");
     runner.hello();
   }
 
   // Some random class definition.
-  public class Runner {
+  public class HelloWorld {
 
     private String str;
 
-    public Runner(String name) {
+    public HelloWorld(String name) {
       str = name;
     }
 

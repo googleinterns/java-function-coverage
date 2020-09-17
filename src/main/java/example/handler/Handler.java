@@ -14,41 +14,21 @@
 
 package example.handler;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
+import example.handler.collect.Collect;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
-public class Handler {
+public class Handler implements Runnable {
 
-  private ArrayList<String> classNames;
-  private ArrayList<String> methodNames;
-  private ArrayList<Boolean> methodFlags;
-
-  // To avoid Runner and LastCall trying to write to file at the same time
-  // one can use shutdown and awaitTermination functions in the scheduler.
-  // So that scheduler will not schedule any other tasks and
-  // LastCall will be blocked until scheduler finishes its already scheduled task.
-  // One can also use shutdownNow method to cancel all the tasks.
-  // Here, shutdownNow is used.
   ScheduledExecutorService scheduler;
 
-  // Constructor that uses the CoverageMetrics variables. Custom Handler must implement this.
-  public Handler(
-      ArrayList<String> classNames, ArrayList<String> methodNames, ArrayList<Boolean> methodFlags) {
-    this.classNames = classNames;
-    this.methodNames = methodNames;
-    this.methodFlags = methodFlags;
-  }
-
-  // Function start() will be invoked at the beginning.
-  // It creates a scheduler that will call a runnable every 500ms.
-  // Custom Handler must implement a start() function.
-  public void start() {
+  // Function run() will be invoked at the beginning.
+  // It is the entry point of Runnable.
+  // It creates a scheduler that will call runnable "collect" every 2000ms.//
+  // Creates a shutdown hook with "collect"
+  public void run() {
 
     scheduler =
         Executors.newScheduledThreadPool(
@@ -61,59 +41,18 @@ public class Handler {
                 return thread;
               }
             });
-    scheduler.scheduleWithFixedDelay(new Runner(), 500, 500, TimeUnit.MILLISECONDS);
-    Runtime.getRuntime().addShutdownHook(new LastCall());
-  }
 
-  // Runner implements a Runnable that will write the coverage data.
-  // Function run() will be called by scheduler every 500ms.
-  public class Runner implements Runnable {
+    Collect collect = new Collect();
 
-    public void run() {
+    scheduler.scheduleWithFixedDelay(collect, 2000, 2000, TimeUnit.MILLISECONDS);
 
-      try {
-        File myObj = new File("coverage.out");
-        myObj.createNewFile();
-        FileWriter myWriter = new FileWriter("coverage.out");
-        final int len = methodNames.size();
-        for (int i = 0; i < len; i++) {
-          myWriter.write(classNames.get(i) + ":");
-          myWriter.write(methodNames.get(i) + ":");
-          if (methodFlags.get(i)) myWriter.write("1\n");
-          else myWriter.write("0\n");
-        }
-        myWriter.close();
-      } catch (IOException e) {
-        System.out.println("An error occurred while writing the coverage data");
-        e.printStackTrace();
-      }
-    }
-  }
-
-  // LastCall implements a Thread that will write the coverage data.
-  // Function run() will be called just before jvm exits.
-  public class LastCall extends Thread {
-
-    public void run() {
-
-      scheduler.shutdownNow();
-
-      try {
-        File myObj = new File("coverage.out");
-        myObj.createNewFile();
-        FileWriter myWriter = new FileWriter("coverage.out");
-        final int len = methodNames.size();
-        for (int i = 0; i < len; i++) {
-          myWriter.write(classNames.get(i) + ":");
-          myWriter.write(methodNames.get(i) + ":");
-          if (methodFlags.get(i)) myWriter.write("1\n");
-          else myWriter.write("0\n");
-        }
-        myWriter.close();
-      } catch (IOException e) {
-        System.out.println("An error occurred while writing the coverage data");
-        e.printStackTrace();
-      }
-    }
+    Runtime.getRuntime()
+        .addShutdownHook(
+            new Thread() {
+              public void run() {
+                scheduler.shutdownNow();
+                collect.run();
+              }
+            });
   }
 }

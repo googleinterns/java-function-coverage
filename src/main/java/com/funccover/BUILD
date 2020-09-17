@@ -1,4 +1,4 @@
-load("@rules_java//java:defs.bzl", "java_binary")
+load("@rules_java//java:defs.bzl", "java_binary", "java_library")
 
 java_binary(
     name = "funccover",
@@ -10,5 +10,15 @@ java_binary(
         "HandlerLoader.java",
     ],
     deploy_manifest_lines = ["Premain-Class: com.funccover.CoverageAgent"],
-    deps = ["@maven//:org_javassist_javassist"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@maven//:org_ow2_asm_asm",
+        "@maven//:org_ow2_asm_asm_commons",
+    ],
+)
+
+java_library(
+    name = "CoverageMetrics",
+    srcs = ["CoverageMetrics.java"],
+    visibility = ["//visibility:public"],
 )

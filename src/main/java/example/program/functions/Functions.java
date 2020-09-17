@@ -16,39 +16,43 @@ package example.program.functions;
 
 public class Functions {
 
+  public static void f0() {
+    System.out.println("f0 is executed");
+  }
+
   public static void f1() {
-    System.out.println("f1 is executed\n");
+    System.out.println("f1 is executed");
   }
 
   public static void f2() {
-    System.out.println("f2 is executed\n");
+    System.out.println("f2 is executed");
   }
 
   public static void f3() {
-    System.out.println("f3 is executed\n");
+    System.out.println("f3 is executed");
   }
 
   public static void f4() {
-    System.out.println("f4 is executed\n");
+    System.out.println("f4 is executed");
   }
 
   public static void f5() {
-    System.out.println("f5 is executed\n");
+    System.out.println("f5 is executed");
   }
 
   public static void f6() {
-    System.out.println("f6 is executed\n");
+    System.out.println("f6 is executed");
   }
 
   public static void f7() {
-    System.out.println("f7 is executed\n");
+    System.out.println("f7 is executed");
   }
 
   public static void f8() {
-    System.out.println("f8 is executed\n");
+    System.out.println("f8 is executed");
   }
 
   public static void f9() {
-    System.out.println("f9 is executed\n");
+    System.out.println("f9 is executed");
   }
 }
