@@ -1,0 +1,21 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  check-format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+        with:
+          java-version: "12"
+      - uses: axel-op/googlejavaformat-action@v3.3.2
+      - uses: thompsonja/bazel-buildifier@v0.2.1
+        with:
+          warnings: all
