@@ -30,28 +30,27 @@ public class CoverageMetrics {
   // primitive is vital.
   public static boolean[] methodFlags = new boolean[1024];
 
-  private static int ARRAY_SIZE = 1024;
-  public static int METHOD_COUNT = 0;
+  private static int arraySize = 1024;
+  public static int methodCount = 0;
 
   // Inserts a new flag with the method descriptions.
   public static synchronized void addMethod(final String packageName, final String methodName) {
     // If size of methodFlags is smaller than number of methods, doubles its size.
     // Since we increase the size exponentially, in average time complexity of this method is O(1)
     // Implemented carefully to avoid race conditions since other threads can call setExecuted
-    if (METHOD_COUNT == ARRAY_SIZE) {
+    if (methodCount == arraySize) {
       boolean[] temp = methodFlags;
-      methodFlags = new boolean[ARRAY_SIZE * 2];
-      for (int i = 0; i < ARRAY_SIZE; i++) {
+      methodFlags = new boolean[arraySize * 2];
+      for (int i = 0; i < arraySize; i++) {
         methodFlags[i] |= temp[i];
       }
-      ARRAY_SIZE <<= 1;
+      arraySize = arraySize * 2;
     }
 
     // Adds method descriptions to the variables
     classNames.add(packageName);
     methodNames.add(methodName);
-
-    METHOD_COUNT++;
+    methodCount++;
   }
 
   // Sets the given methods flag value to true.

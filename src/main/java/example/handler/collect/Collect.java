@@ -24,7 +24,6 @@ public class Collect implements Runnable {
 
   // Method run must be implemented since it is a Runnable
   public void run() {
-
     try {
       // Creates a file named "coverage.out"
       File coverOut = new File("coverage.out");
@@ -32,7 +31,7 @@ public class Collect implements Runnable {
       FileWriter coverWriter = new FileWriter("coverage.out");
 
       // Iterates thorough all the methods and writes them to the file one by one
-      final int len = CoverageMetrics.METHOD_COUNT;
+      final int len = CoverageMetrics.methodCount;
       for (int i = 0; i < len; i++) {
         coverWriter.write(CoverageMetrics.classNames.get(i) + ":");
         coverWriter.write(CoverageMetrics.methodNames.get(i) + ":");

@@ -106,10 +106,11 @@ public class CoverageTransformer implements ClassFileTransformer {
       CoverageMetrics.addMethod(className, methodName + ":" + methodDesc);
 
       // Adds necessary bytecode to beginning of the method
-      // Source code representation is com.funccover.CoverageMetrics.setexecuted(counter)
+      // Source code representation is com.funccover.CoverageMetrics.methodFlags[counter] = true;
+      mv.visitFieldInsn(GETSTATIC, "com/funccover/CoverageMetrics", "methodFlags", "[Z");
       mv.visitLdcInsn(counter);
-      mv.visitMethodInsn(
-          INVOKESTATIC, "com/funccover/CoverageMetrics", "setExecuted", "(I)V", false);
+      mv.visitInsn(ICONST_1);
+      mv.visitInsn(BASTORE);
 
       counter++;
     }
