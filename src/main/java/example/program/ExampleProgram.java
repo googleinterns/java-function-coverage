@@ -17,48 +17,61 @@ package example.program;
 import example.program.functions.Functions;
 import java.util.Scanner;
 
-public class HelloWorld {
+public class ExampleProgram {
 
   public static void main(String[] args) {
-    System.out.println("Hello World");
+    System.out.println("This is an example program to test funccover coverage agent");
+    System.out.println("Please print an integer in range [0-9].");
+    System.out.println("Program will call f$number function in the functions package.");
+    System.out.println("You can enter as many numbers you want.");
     System.out.println(
-        "Enter some space seperated integers in the range [1..9] in a line in any order");
-    System.out.println("Program will call the function f$number for each number");
-    System.out.println(
-        "For example handler coverage.out will contain invoked function names, lets try it:");
+        "Example handler will save the data to coverage.out file every 500ms and when the program"
+            + " exits.");
+    System.out.println("Enter -1 to exit the program.");
     Scanner in = new Scanner(System.in);
-    String s = in.nextLine();
-    String[] splitted = s.split("\\s+");
-    for (String number : splitted) {
+    while (true) {
+
+      int number = in.nextInt();
+
       switch (number) {
-        case "1":
+        case -1:
+          exitProgram();
+        case 0:
+          Functions.f0();
+          break;
+        case 1:
           Functions.f1();
           break;
-        case "2":
+        case 2:
           Functions.f2();
           break;
-        case "3":
+        case 3:
           Functions.f3();
           break;
-        case "4":
+        case 4:
           Functions.f4();
           break;
-        case "5":
+        case 5:
           Functions.f5();
           break;
-        case "6":
+        case 6:
           Functions.f6();
           break;
-        case "7":
+        case 7:
           Functions.f7();
           break;
-        case "8":
+        case 8:
           Functions.f8();
           break;
-        case "9":
+        case 9:
           Functions.f9();
           break;
       }
     }
+  }
+
+  private static void exitProgram() {
+    System.out.println("Exit!");
+    System.exit(0);
   }
 }

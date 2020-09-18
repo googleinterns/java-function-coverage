@@ -15,13 +15,18 @@
 package com.funccover;
 
 class Filter {
-  // FIlters the classes that we do not want to instrument.
-  // This function can be changed to allow whitelists/blacklists.
+  // Filters agent classes and classes in loaders that can not load CoverageMetrics.
+  // Can be modified to allow whitelists/blacklists.
   protected static boolean check(ClassLoader loader, String className) {
-    if (className.startsWith("com/funccover") || loader == null) {
+    if (className.startsWith("com/funccover")) {
       return false;
     }
-    if (loader == CoverageMetrics.class.getClassLoader()) return true;
+    while (loader != null && loader != CoverageMetrics.class.getClassLoader()) {
+      loader = loader.getParent();
+    }
+    if (loader == CoverageMetrics.class.getClassLoader()) {
+      return true;
+    }
     return false;
   }
 }

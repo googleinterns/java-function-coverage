@@ -14,32 +14,19 @@
 
 package com.funccover;
 
-import java.io.ByteArrayInputStream;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
-import javassist.CannotCompileException;
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.CtMethod;
-import javassist.Modifier;
+import org.objectweb.asm.*;
+import org.objectweb.asm.commons.AdviceAdapter;
 
-// CoverageTransformer implements a class that will be used in instrumentation.
+// CoverageTransformer implements ClassFileTransformer
+// Its transform method will be invoked before JVM loads a class to the memory
 public class CoverageTransformer implements ClassFileTransformer {
 
   // Keeps the number methods instrumented so far.
+  // This variable is being used to index methods.
   private static int counter = 0;
-
-  // ClassPool object returned by getDefault() searches the default system search path.
-  // If a program is running on a web application server such as JBoss and Tomcat,
-  // the ClassPool object may not be able to find user classes.
-  // In that case, an additional class path must be registered to the ClassPool.
-  // ClassPool used to compile inserted source code to bytecode.
-  private final ClassPool classPool = ClassPool.getDefault();
-
-  CoverageTransformer() {
-    classPool.importPackage("com.funccover.CoverageMetrics");
-  }
 
   // Method transform instruments given bytecode and returns instrumented bytecode.
   // If it returns null, then given class will be loaded without instrumentation.
@@ -52,74 +39,80 @@ public class CoverageTransformer implements ClassFileTransformer {
       byte[] classfileBuffer)
       throws IllegalClassFormatException {
 
-    // If we do not want to instrument given class, return null.
+    // Filtering classes we won't instrument
     if (classBeingRedefined != null || Filter.check(loader, className) == false) {
       return null;
     }
 
-    byte[] result = null;
-    try {
-      // Creates a new class with the given bytecode.
-      CtClass ct = classPool.makeClass(new ByteArrayInputStream(classfileBuffer));
+    // Instruments the methods of given class
+    ClassReader reader = new ClassReader(classfileBuffer);
+    ClassWriter writer = new ClassWriter(reader, ClassWriter.COMPUTE_MAXS);
+    reader.accept(new CoverageClassVisitor(writer, className), ClassReader.EXPAND_FRAMES);
 
-      // Checks if the class is already loaded.
-      if (ct.isFrozen()) {
-        ct.detach();
-        return null;
-      }
-
-      // Filter for instrumentation.
-      if (ct.isPrimitive()
-          || ct.isArray()
-          || ct.isAnnotation()
-          || ct.isEnum()
-          || ct.isInterface()) {
-        ct.detach();
-        return null;
-      }
-
-      // Variable flag is true if some methods inside ct are instrumented.
-      boolean flag = false;
-
-      // Iterates over all methods and instruments them.
-      for (CtMethod method : ct.getDeclaredMethods()) {
-        if (method.isEmpty()) {
-          continue;
-        }
-        instrumentMethod(method, loader);
-        flag = true;
-      }
-
-      if (flag) {
-        result = ct.toBytecode();
-      }
-
-      // Function detach removes newly created class from cp to avoid unnecesarry memory
-      // consumption.
-      ct.detach();
-    } catch (Throwable e) {
-      e.printStackTrace();
-    }
-    return result;
+    return writer.toByteArray();
   }
 
-  // Inserts a new method to CoverageMetrics and inserts setExecuted call to the given method.
-  private static void instrumentMethod(CtMethod target, ClassLoader loader)
-      throws CannotCompileException {
-    if (isNative(target)) {
-      return;
+  // CoverageClassVisitor instance will invoke visitMethod for each method.
+  public static class CoverageClassVisitor extends ClassVisitor {
+
+    private String className;
+
+    public CoverageClassVisitor(ClassVisitor classVisitor, String className) {
+      super(Opcodes.ASM8, classVisitor);
+      this.className = className;
     }
 
-    String className = target.getLongName();
-    String methodName = className.substring(className.lastIndexOf('.') + 1);
-    className = className.substring(0, className.lastIndexOf('.'));
-
-    CoverageMetrics.addMethod(className, methodName);
-    target.insertBefore("CoverageMetrics.setExecuted(" + counter + ");");
-    counter++;
+    @Override
+    public MethodVisitor visitMethod(
+        int methodAccess,
+        String methodName,
+        String methodDesc,
+        String signature,
+        String[] exceptions) {
+      MethodVisitor methodVisitor =
+          cv.visitMethod(methodAccess, methodName, methodDesc, signature, exceptions);
+      if (methodVisitor == null) {
+        return null;
+      }
+      return new CoverageAdviceAdapter(
+          Opcodes.ASM8, methodVisitor, methodAccess, methodName, methodDesc, className);
+    }
   }
 
-  public static boolean isNative(CtMethod method) {
-    return Modifier.isNative(method.getModifiers());
+  // AdviceAdapter to instrument methods.
+  public static class CoverageAdviceAdapter extends AdviceAdapter {
+
+    private String methodName, methodDesc, className;
+
+    protected CoverageAdviceAdapter(
+        int api,
+        MethodVisitor methodVisitor,
+        int methodAccess,
+        String methodName,
+        String methodDesc,
+        String className) {
+      super(Opcodes.ASM8, methodVisitor, methodAccess, methodName, methodDesc);
+      this.methodName = methodName;
+      this.methodDesc = methodDesc;
+      this.className = className;
+    }
+
+    @Override
+    protected void onMethodEnter() {
+      if ("<init>".equals(methodName) || "<clinit>".equals(methodName)) {
+        return;
+      }
+      // Adds current method to CoverageMetrics
+      CoverageMetrics.addMethod(className, methodName + ":" + methodDesc);
+
+      // Adds necessary bytecode to beginning of the method
+      // Source code representation is com.funccover.CoverageMetrics.methodFlags[counter] = true;
+      mv.visitFieldInsn(GETSTATIC, "com/funccover/CoverageMetrics", "methodFlags", "[Z");
+      mv.visitLdcInsn(counter);
+      mv.visitInsn(ICONST_1);
+      mv.visitInsn(BASTORE);
+
+      counter++;
+    }
   }
 }

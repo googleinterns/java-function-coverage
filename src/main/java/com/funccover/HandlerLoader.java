@@ -20,65 +20,59 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-// HandlerLoader implements the functionality of loading and starting the Handler.
+// HandlerLoader implements the functionality of loading and starting the Handler that implements a
+// Runnable.
 class HandlerLoader {
 
-  // Loads the given class to the memory and invokes its start() method with CoverageMetrics
-  // variables.
+  // Loads the given Runnable class to the memory, creates an instance, invokes its run() method.
   protected static void initializeCustomHandler(String path, String className) {
 
+    // Converts fiven path to URL type
     URL url = getURL(path);
-    File file = new File(path);
 
-    // Variable cl is the classloader to load the handler.
+    // Variable cl is the URLClassloader that will load the handler.
+    // Any dependencies files that Handler imports that are not loaded must be in the classpath of
+    // cl.
+    // In case of jar, it must be a fat jar.
     URLClassLoader cl = null;
 
-    // Variable handler keeps an instance of given class.
-    // Variable starts keeps the start() method.
+    // Variable handler will keep the instance of given class.
+    // Variable entry will keep the run() method of the handler
     Object handler = null;
-    Method start = null;
+    Method entry = null;
 
     try {
       // Loads the class from given URL.
       cl = new URLClassLoader(new URL[] {url});
       Class cls = cl.loadClass(className);
 
-      // Gets the constructor of given class an create an instance.
-      Constructor handlerConstructor =
-          cls.getConstructor(
-              new Class[] {
-                CoverageMetrics.classNames.getClass(),
-                CoverageMetrics.methodNames.getClass(),
-                CoverageMetrics.methodFlags.getClass()
-              });
+      // Gets the constructor of given class an creates an instance.
+      Constructor handlerConstructor = cls.getConstructor();
+      handler = handlerConstructor.newInstance();
 
-      // Creates an instance of the handler with CoverageMetrics variables.
-      handler =
-          handlerConstructor.newInstance(
-              CoverageMetrics.classNames, CoverageMetrics.methodNames, CoverageMetrics.methodFlags);
-
-      // Gets the start method in newly created instance.
-      start = cls.getMethod("start");
+      // Gets the run() method inside handler
+      entry = cls.getMethod("run");
     } catch (Exception e) {
       e.printStackTrace();
       System.out.println("Could not load the custom handler " + className);
       return;
     }
 
-    if (handler == null || start == null || cl == null) {
+    if (handler == null || entry == null || cl == null) {
       return;
     }
 
     try {
-      start.invoke(handler);
+      // Invokes the run() method of the handler
+      entry.invoke(handler);
     } catch (Exception e) {
       e.printStackTrace();
       System.out.println("Could not invoke the start() method in " + className);
     }
   }
 
+  // Parses the given path and returns corresponding URL
   protected static URL getURL(String path) {
-
     String[] pathArgs = path.split(":", 2);
 
     if (pathArgs.length != 2) {
@@ -109,10 +103,11 @@ class HandlerLoader {
       try {
         return new URL(pathArgs[1]);
       } catch (java.net.MalformedURLException e) {
-        System.out.println("malformed url " + pathArgs[1]);
+        System.out.println("malformed URL " + pathArgs[1]);
         return null;
       }
     }
+
     System.out.println("invalid path type " + pathArgs[0]);
     return null;
   }

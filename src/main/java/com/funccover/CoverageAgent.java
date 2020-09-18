@@ -18,8 +18,9 @@ import java.lang.instrument.Instrumentation;
 
 public class CoverageAgent {
 
-  // Methid premain starts executing by the jvm before main method.
-  // It initializes the Handler and Transformer.
+  // Method premain is the entry point of agent.
+  // Java Virtual Machine invokes premain before main
+  // Initializes the Handler and Transformer.
   public static void premain(String args, Instrumentation inst) {
 
     if (args == null || args == "") {
@@ -33,13 +34,12 @@ public class CoverageAgent {
       return;
     }
 
-    // Loads the custom handler.
-    // Creates an instance with coverage variables.
-    // Invokes the start() method.
+    // Loads the handler, creates an instance of given runnable object
+    // Invokes its entry point run().
     HandlerLoader.initializeCustomHandler(tokens[0], tokens[1]);
 
-    // Adds out CoverageTransformer class as insrumentation.
-    // CoverageTransformer overrides transform method which will be called everytime jvm loads a
+    // Adds CoverageTransformer class as Transformer
+    // CoverageTransformer implements transform method which will be invoked before jvm loads a
     // class.
     inst.addTransformer(new CoverageTransformer());
   }

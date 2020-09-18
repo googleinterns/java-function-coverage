@@ -15,7 +15,8 @@ load("@rules_jvm_external//:defs.bzl", "maven_install")
 
 maven_install(
     artifacts = [
-        "org.javassist:javassist:3.23.1-GA",
+        "org.ow2.asm:asm:8.0.1",
+        "org.ow2.asm:asm-commons:8.0.1",
     ],
     repositories = [
         "https://jcenter.bintray.com/",
