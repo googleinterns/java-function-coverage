@@ -34,7 +34,7 @@ limitations under the License.
 
 ### With The Included Examples
 
-* Build [funccover agent](#funccover-agent)
+* Build [funccover agent](#funccover-agent).
 
 ```bash
 $ bazel build //src/main/java/com/funccover:funccover_deploy.jar
@@ -50,42 +50,53 @@ $ bazel build //src/main/java/example/handler:handler_deploy.jar
 
 This should generate the file ```bazel-bin/src/main/java/example/handler/handler_deploy.jar``` under the project root.
 
-* Build the example program binary with coverage
+* Build the example program binary.
 
 ```bash
-$ bazel build --jvmopt="-javaagent:bazel-bin/src/main/java/com/funccover/funccover_deploy.jar='jar:bazel-bin/src/main/java/example/handler/handler_deploy.jar example.handler.Handler' "  //src/main/java/example/program:ExampleProgram 
+$ bazel build //src/main/java/example/program:ExampleProgram 
 ```
 
-This will generate an executable inside ```bazel-bin/src/main/java/example/program/ExampleProgram```.
+This will generate an executable inside ```bazel-bin/src/main/java/example/program/ExampleProgram```. 
+
+* Run the program with funccover.
+```bash
+$ ./bazel-bin/src/main/java/example/program/ExampleProgram --jvm_flag="-javaagent:bazel-bin/src/main/java/com/funccover/funccover_deploy.jar=handler-jar=bazel-bin/src/main/java/example/handler/handler_deploy.jar,handler-entry=example.handler.Handler"
+```
+
 When you run it, it will ask you to enter numbers in range [0-9], then it will call ```f$number``` function for each number you entered.
 Coverage data will be saved to ```coverage.out```.
 
 ### With Customization
 
-* Build [funccover agent](#funccover-agent)
+* Build [funccover agent](#funccover-agent).
 
 ```bash
 $ bazel build //src/main/java/com/funccover:funccover_deploy.jar
 ```
 
-
-* Implement and build your [handler](#handler)
+* Implement and build your [handler](#handler).
    * Handler program must implement a Runnable class as it's entry pont.
    * Agent will create a new class loader with given path.
    * It will load given entry point, Runnable class into the memory, create an instance of it and invoke the run() method. 
    * Path must contain all the dependencies of handler program since they will be needed in runtime.
    * Please take a look at the examples, [Handler](../master/src/main/java/example/handler/Handler.java), [Simple Handler](../master/src/main/java/example/handler/SimpleHandler.java)
    
-* Build and run your program
+* Build your program binary.
 
 ```bash
-$ bazel build --jvmopt="-javaagent:path/to/agent.jar='type:path/to/handler packageName.ClassName' "  //YourProgram
+$ bazel build //YourProgram
 ```
 
-You can also attach funccover agent to programs that are already built. To attach the agent you should give the agent as an argument to jvm.
+* Run your program with funccover.
 
 ```bash
-$ java -javaagent:path/to/agent.jar='type:path/to/handler packageName.ClassName' -jar YourProgram.jar
+$ ./YourProgram --jvm_flag="-javaagent:path/to/funccover.jar=[option1]=[value1],[option2]=[value2]"
+```
+
+You can also attach funccover agent to jar files.
+
+```bash
+$ java -javaagent:path/to/agent.jar=[option1]=[value1],[option2]=[value2] -jar YourProgram.jar
 ```
 
 ### Concepts
@@ -96,18 +107,17 @@ Java Function Coverage tool consists of 2 parts, funccover agent and a handler. 
 
 In general a java agent is just a specially crafted .jar file that utilizes the [Instrumentation API](https://docs.oracle.com/javase/7/docs/api/java/lang/instrument/Instrumentation.html "Instrumentation API"). Using Instrumentation API, funccover agent instruments bytecodes before JVM loads them into memory. Using instrumentation, we record execution of methods inside a data structure called CoverageMetrics. Agent itself does not upload/write the coverage data. Handler program does.
 
-funccover agent gets 2 arguments. 
-
+funccover has 4 options. Options must be given in following format:
 ```bash
-"type:path/to/handler packageName.ClassName"
+-javaagent:path/to/funccover.jar=[option1]=[value1],[option2]=[value2]...
 ```
 
-* type can be "url", "jar" or "dir". 
-    * If its url, path/to/handler must be an url
-    * If its jar path/to/handler must be a path to a jar file  
-    * If its dir path/to/handler must be a path to a directory that contains .class files (folders must be structured same as jar files)
-    
-* packageName.ClassName argument must be the fully qualified name of the entry class that implements a Runnable
+| Option | Description |
+| --- | ----------- |
+| handler-jar | Path to handler's jar file. |
+| handler-entry | Fully qualified name of the entry class that implements a Runnable (package.name.ClassName).|
+| includes | A list of class names that should be included in instrumentation. The list entries are separated by a colon (:) and may use wildcard characters (* and ?). Default is *.
+| excludes | A list of class names that should be excluded from instrumentation. The list entries are separated by a colon (:) and may use wildcard characters (* and ?). |
 
 #### Handler
 

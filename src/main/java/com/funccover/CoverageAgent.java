@@ -19,26 +19,21 @@ import java.lang.instrument.Instrumentation;
 public class CoverageAgent {
 
   // Method premain is the entry point of agent.
-  // Java Virtual Machine invokes premain before main
+  // Java Virtual Machine invokes premain before main.
   // Initializes the Handler and Transformer.
   public static void premain(String args, Instrumentation inst) {
+    AgentOptions options = new AgentOptions(args);
 
-    if (args == null || args == "") {
-      System.out.println("no arguments");
-      return;
-    }
-
-    String[] tokens = args.split(" ");
-    if (tokens.length != 2) {
-      System.out.println("arguments are invalid");
-      return;
-    }
-
-    // Loads the handler, creates an instance of given runnable object
+    // Loads the handler, creates an instance of given Runnable class.
     // Invokes its entry point run().
-    HandlerLoader.initializeCustomHandler(tokens[0], tokens[1]);
+    // If options are not given does nothing.
+    HandlerLoader.initializeCustomHandler(options.getHandlerJar(), options.getHandlerEntry());
 
-    // Adds CoverageTransformer class as Transformer
+    // Adds the wildcard patterns to the Filter.
+    Filter.setIncludes(options.getIncludes());
+    Filter.setExcludes(options.getExcludes());
+
+    // Adds CoverageTransformer class as Transformer.
     // CoverageTransformer implements transform method which will be invoked before jvm loads a
     // class.
     inst.addTransformer(new CoverageTransformer());

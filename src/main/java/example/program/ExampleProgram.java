@@ -20,12 +20,12 @@ import java.util.Scanner;
 public class ExampleProgram {
 
   public static void main(String[] args) {
-    System.out.println("This is an example program to test funccover coverage agent");
+    System.out.println("This is an example program to test funccover coverage agent!");
     System.out.println("Please print an integer in range [0-9].");
     System.out.println("Program will call f$number function in the functions package.");
     System.out.println("You can enter as many numbers you want.");
     System.out.println(
-        "Example handler will save the data to coverage.out file every 500ms and when the program"
+        "Example handler will save the data to coverage.out file every 2000ms and when the program"
             + " exits.");
     System.out.println("Enter -1 to exit the program.");
     Scanner in = new Scanner(System.in);

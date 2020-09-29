@@ -3,6 +3,7 @@ load("@rules_java//java:defs.bzl", "java_binary", "java_library")
 java_binary(
     name = "funccover",
     srcs = [
+        "AgentOptions.java",
         "CoverageAgent.java",
         "CoverageMetrics.java",
         "CoverageTransformer.java",

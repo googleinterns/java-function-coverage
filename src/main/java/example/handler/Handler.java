@@ -26,8 +26,8 @@ public class Handler implements Runnable {
 
   // Function run() will be invoked at the beginning.
   // It is the entry point of Runnable.
-  // It creates a scheduler that will call runnable "collect" every 2000ms.//
-  // Creates a shutdown hook with "collect"
+  // It creates a scheduler that will call runnable "collect" every 2000ms.
+  // Creates a shutdown hook with "collect".
   public void run() {
 
     scheduler =

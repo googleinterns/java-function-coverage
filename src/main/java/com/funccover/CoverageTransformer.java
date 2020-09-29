@@ -20,8 +20,8 @@ import java.security.ProtectionDomain;
 import org.objectweb.asm.*;
 import org.objectweb.asm.commons.AdviceAdapter;
 
-// CoverageTransformer implements ClassFileTransformer
-// Its transform method will be invoked before JVM loads a class to the memory
+// CoverageTransformer implements ClassFileTransformer.
+// Its transform method will be invoked before JVM loads a class to the memory.
 public class CoverageTransformer implements ClassFileTransformer {
 
   // Keeps the number methods instrumented so far.
@@ -39,12 +39,12 @@ public class CoverageTransformer implements ClassFileTransformer {
       byte[] classfileBuffer)
       throws IllegalClassFormatException {
 
-    // Filtering classes we won't instrument
+    // Filtering classes we won't instrument.
     if (classBeingRedefined != null || Filter.check(loader, className) == false) {
       return null;
     }
 
-    // Instruments the methods of given class
+    // Instruments the methods of given class.
     ClassReader reader = new ClassReader(classfileBuffer);
     ClassWriter writer = new ClassWriter(reader, ClassWriter.COMPUTE_MAXS);
     reader.accept(new CoverageClassVisitor(writer, className), ClassReader.EXPAND_FRAMES);
@@ -102,10 +102,10 @@ public class CoverageTransformer implements ClassFileTransformer {
       if ("<init>".equals(methodName) || "<clinit>".equals(methodName)) {
         return;
       }
-      // Adds current method to CoverageMetrics
+      // Adds current method to CoverageMetrics.
       CoverageMetrics.addMethod(className, methodName + ":" + methodDesc);
 
-      // Adds necessary bytecode to beginning of the method
+      // Adds necessary bytecode to beginning of the method.
       // Source code representation is com.funccover.CoverageMetrics.methodFlags[counter] = true;
       mv.visitFieldInsn(GETSTATIC, "com/funccover/CoverageMetrics", "methodFlags", "[Z");
       mv.visitLdcInsn(counter);

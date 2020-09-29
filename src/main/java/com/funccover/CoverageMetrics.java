@@ -36,8 +36,8 @@ public class CoverageMetrics {
   // Inserts a new flag with the method descriptions.
   public static synchronized void addMethod(final String packageName, final String methodName) {
     // If size of methodFlags is smaller than number of methods, doubles its size.
-    // Since we increase the size exponentially, in average time complexity of this method is O(1)
-    // Implemented carefully to avoid race conditions since other threads can call setExecuted
+    // Since we increase the size exponentially, in average time complexity of this method is O(1).
+    // Implemented carefully to avoid race conditions since other threads can call setExecuted.
     if (methodCount == arraySize) {
       boolean[] temp = methodFlags;
       methodFlags = new boolean[arraySize * 2];
@@ -51,10 +51,5 @@ public class CoverageMetrics {
     classNames.add(packageName);
     methodNames.add(methodName);
     methodCount++;
-  }
-
-  // Sets the given methods flag value to true.
-  public static void setExecuted(final int index) {
-    methodFlags[index] = true;
   }
 }

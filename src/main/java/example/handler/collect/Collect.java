@@ -22,7 +22,6 @@ import java.io.IOException;
 // Collect implements a Runnable that will write the coverage data.
 public class Collect implements Runnable {
 
-  // Method run must be implemented since it is a Runnable
   public void run() {
     try {
       // Creates a file named "coverage.out"
