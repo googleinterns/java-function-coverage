@@ -17,7 +17,7 @@ package example.handler;
 public class SimpleHandler implements Runnable {
 
   // Entry point run() method must be implemented for Runnable.
-  // It will be invoked by HandlerLoader.
+  // It will be loaded and invoked by HandlerLoader.
   public void run() {
     // You can import CoverageMetrics and use it to upload coverage data.
     System.out.println("Simple Handler started executing");

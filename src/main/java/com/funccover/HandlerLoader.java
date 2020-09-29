@@ -20,37 +20,37 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 
-// HandlerLoader implements the functionality of loading and starting the Handler that implements a
-// Runnable.
+// HandlerLoader implements the functionality of loading and starting the Handler.
 class HandlerLoader {
 
   // Loads the given Runnable class to the memory, creates an instance, invokes its run() method.
   protected static void initializeCustomHandler(String path, String className) {
+    if (path == null || className == null) {
+      return;
+    }
 
-    // Converts fiven path to URL type
+    // Converts given jar path to URL.
     URL url = getURL(path);
 
-    // Variable cl is the URLClassloader that will load the handler.
-    // Any dependencies files that Handler imports that are not loaded must be in the classpath of
-    // cl.
-    // In case of jar, it must be a fat jar.
+    // Variable cl is the URLClassloader that will load the entry point of Handler.
+    // Any external dependencies of the Handler must be in the jar.
     URLClassLoader cl = null;
 
-    // Variable handler will keep the instance of given class.
-    // Variable entry will keep the run() method of the handler
-    Object handler = null;
+    // Variable runnable will keep the instance of given class.
+    // Variable entry will keep the run() method of the Runnable.
+    Object runnable = null;
     Method entry = null;
 
     try {
       // Loads the class from given URL.
       cl = new URLClassLoader(new URL[] {url});
-      Class cls = cl.loadClass(className);
+      Class<?> cls = cl.loadClass(className);
 
-      // Gets the constructor of given class an creates an instance.
-      Constructor handlerConstructor = cls.getConstructor();
-      handler = handlerConstructor.newInstance();
+      // Gets the constructor of given Runnable class an creates an instance.
+      Constructor<?> runnableConstructor = cls.getConstructor();
+      runnable = runnableConstructor.newInstance();
 
-      // Gets the run() method inside handler
+      // Gets the run() method inside the Runnable.
       entry = cls.getMethod("run");
     } catch (Exception e) {
       e.printStackTrace();
@@ -58,57 +58,27 @@ class HandlerLoader {
       return;
     }
 
-    if (handler == null || entry == null || cl == null) {
+    if (runnable == null || entry == null || cl == null) {
       return;
     }
 
     try {
-      // Invokes the run() method of the handler
-      entry.invoke(handler);
+      // Invokes the run() method of the given Runnable class.
+      entry.invoke(runnable);
     } catch (Exception e) {
       e.printStackTrace();
       System.out.println("Could not invoke the start() method in " + className);
     }
   }
 
-  // Parses the given path and returns corresponding URL
-  protected static URL getURL(String path) {
-    String[] pathArgs = path.split(":", 2);
-
-    if (pathArgs.length != 2) {
-      System.out.println("invalid path " + path);
+  // Parses the given path and returns corresponding URL.
+  private static URL getURL(String path) {
+    File file = new File(path);
+    try {
+      return new URL("jar", "", "file:" + file.getAbsolutePath() + "!/");
+    } catch (java.net.MalformedURLException e) {
+      System.out.println("malformed jar path " + path);
       return null;
     }
-
-    // Converts dir in filepath to URL.
-    if (pathArgs[0].equals("dir")) {
-      File file = new File(pathArgs[1]);
-      try {
-        return file.toURI().toURL();
-      } catch (java.net.MalformedURLException e) {
-        System.out.println("malformed path " + pathArgs[1]);
-        return null;
-      }
-    }
-    // Converts jar in filepath to URL.
-    else if (pathArgs[0].equals("jar")) {
-      File file = new File(pathArgs[1]);
-      try {
-        return new URL("jar", "", "file:" + file.getAbsolutePath() + "!/");
-      } catch (java.net.MalformedURLException e) {
-        System.out.println("malformed path " + pathArgs[1]);
-        return null;
-      }
-    } else if (pathArgs[0].equals("url")) {
-      try {
-        return new URL(pathArgs[1]);
-      } catch (java.net.MalformedURLException e) {
-        System.out.println("malformed URL " + pathArgs[1]);
-        return null;
-      }
-    }
-
-    System.out.println("invalid path type " + pathArgs[0]);
-    return null;
   }
 }
