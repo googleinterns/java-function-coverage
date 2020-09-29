@@ -34,7 +34,7 @@ limitations under the License.
 
 ### With The Included Examples
 
-* Build [funccover agent](#funccover-agent)
+* Build [funccover agent](#funccover-agent).
 
 ```bash
 $ bazel build //src/main/java/com/funccover:funccover_deploy.jar
@@ -50,7 +50,7 @@ $ bazel build //src/main/java/example/handler:handler_deploy.jar
 
 This should generate the file ```bazel-bin/src/main/java/example/handler/handler_deploy.jar``` under the project root.
 
-* Build the example program binary normally.
+* Build the example program binary.
 
 ```bash
 $ bazel build //src/main/java/example/program:ExampleProgram 
@@ -58,7 +58,7 @@ $ bazel build //src/main/java/example/program:ExampleProgram
 
 This will generate an executable inside ```bazel-bin/src/main/java/example/program/ExampleProgram```. 
 
-* Run the program with the agent.
+* Run the program with funccover.
 ```bash
 $ ./bazel-bin/src/main/java/example/program/ExampleProgram --jvm_flag="-javaagent:bazel-bin/src/main/java/com/funccover/funccover_deploy.jar=handler-jar=bazel-bin/src/main/java/example/handler/handler_deploy.jar,handler-entry=example.handler.Handler"
 ```
@@ -68,20 +68,20 @@ Coverage data will be saved to ```coverage.out```.
 
 ### With Customization
 
-* Build [funccover agent](#funccover-agent)
+* Build [funccover agent](#funccover-agent).
 
 ```bash
 $ bazel build //src/main/java/com/funccover:funccover_deploy.jar
 ```
 
-* Implement and build your [handler](#handler)
+* Implement and build your [handler](#handler).
    * Handler program must implement a Runnable class as it's entry pont.
    * Agent will create a new class loader with given path.
    * It will load given entry point, Runnable class into the memory, create an instance of it and invoke the run() method. 
    * Path must contain all the dependencies of handler program since they will be needed in runtime.
    * Please take a look at the examples, [Handler](../master/src/main/java/example/handler/Handler.java), [Simple Handler](../master/src/main/java/example/handler/SimpleHandler.java)
    
-* Build your program
+* Build your program binary.
 
 ```bash
 $ bazel build //YourProgram
@@ -109,7 +109,7 @@ In general a java agent is just a specially crafted .jar file that utilizes the 
 
 funccover has 4 options. Options must be given in following format:
 ```bash
--javaagent:[yourpath/]jacocoagent.jar=[option1]=[value1],[option2]=[value2]
+-javaagent:path/to/funccover.jar=[option1]=[value1],[option2]=[value2]...
 ```
 
 | Option | Description |
